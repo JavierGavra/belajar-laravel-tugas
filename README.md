@@ -48,23 +48,23 @@ Proyek ini adalah platform toko online yang dibangun menggunakan [CodeIgniter 4]
 3. **Konfigurasi database**
 
    - Start module Apache dan MySQL pada XAMPP
-   - Buat database **db_ci4** di phpmyadmin.
+   - Buat database **db_laravel** di phpmyadmin.
    - copy file .env dari tutorial https://www.notion.so/april-ns/Codeigniter4-Migration-dan-Seeding-045ffe5f44904e5c88633b2deae724d2
 
 4. **Jalankan migrasi database**
    ```bash
-   php spark migrate
+   php artisan migrate
    ```
 5. **Seeder data**
    ```bash
-   php spark db:seed ProductSeeder
+   php artisan db:seed ProductSeeder
    ```
    ```bash
-   php spark db:seed UserSeeder
+   php artisan db:seed UserSeeder
    ```
 6. **Jalankan server**
    ```bash
-   php spark serve
+   php artisan serve
    ```
 7. **Akses aplikasi**
    Buka browser dan akses `http://localhost:8080` untuk melihat aplikasi.
@@ -73,14 +73,14 @@ Proyek ini adalah platform toko online yang dibangun menggunakan [CodeIgniter 4]
 
 Proyek menggunakan struktur MVC CodeIgniter 4:
 
-- app/Controllers - Logika aplikasi dan penanganan request
+- app/Http/Controllers - Logika aplikasi dan penanganan request
   - AuthController.php - Autentikasi pengguna
   - ProdukController.php - Manajemen produk
   - TransaksiController.php - Proses transaksi
 - app/Models - Model untuk interaksi database
   - ProductModel.php - Model produk
   - UserModel.php - Model pengguna
-- app/Views - Template dan komponen UI
+- resources/Views - Template dan komponen UI
   - v_home.php - Halaman Utama
   - v_keranjang.php - Halaman keranjang
 - public/img - Gambar produk dan aset
