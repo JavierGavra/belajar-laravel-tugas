@@ -23,9 +23,13 @@ Route::middleware('auth.session')->group(function () {
         Route::post('/edit', [TransaksiController::class, 'cart_edit']);
         Route::get('/delete/{id}', [TransaksiController::class, 'cart_delete']);
         Route::get('/clear', [TransaksiController::class, 'cart_clear']);
+        Route::get('/checkout', [TransaksiController::class, 'checkout']);
+        Route::post('/buy', [TransaksiController::class, 'buy']);
     });
 });
 
 Route::get('/login', [AuthController::class, 'login']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout']);
+Route::get('ajax/destinations', [TransaksiController::class, 'destinations'])->middleware('auth.session')->name('ajax.destinations');
+Route::get('ajax/costs', [TransaksiController::class, 'costs'])->middleware('auth.session')->name('ajax.costs');
