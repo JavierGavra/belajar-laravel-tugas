@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-lg-6">
-        <form action="{{ url('keranjang/buy') }}" method="POST" class="row g-3">
+        <form action="/buy" method="POST" class="row g-3">
             {{-- Token CSRF wajib untuk form POST di Laravel --}}
             @csrf
 

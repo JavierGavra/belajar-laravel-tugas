@@ -42,10 +42,10 @@ class TransaksiController extends Controller
                 'foto' => $request->input('foto')
             ]
         ]);
-        
-        $message = 'Produk berhasil ditambahkan ke keranjang. ' . 
-                   '<a href="' . url('keranjang') . '">Lihat</a>';
-        
+
+        $message = 'Produk berhasil ditambahkan ke keranjang. ' .
+            '<a href="' . url('keranjang') . '">Lihat</a>';
+
         return redirect()->back()->with('success', $message);
     }
 
@@ -53,7 +53,7 @@ class TransaksiController extends Controller
     {
         // Kita melakukan loop terhadap input array 'qty' dari form
         foreach ($request->input('qty') as $id => $quantity) {
-            
+
             // Update kuantitas barang di keranjang
             // 'relative' => false berarti mengganti nilai lama dengan nilai baru
             app('cart')->update($id, [
@@ -72,7 +72,7 @@ class TransaksiController extends Controller
     {
         // Menghapus item berdasarkan ID
         app('cart')->remove($id);
-        
+
         return redirect()->back()->with('success', 'Item berhasil dihapus');
     }
 
@@ -80,19 +80,19 @@ class TransaksiController extends Controller
     {
         // Mengosongkan keranjang
         app('cart')->clear();
-        
+
         return redirect()->back()->with('success', 'Keranjang telah dikosongkan');
     }
 
     public function checkout()
-    {  
+    {
         $response = $this->rajaOngkir->getDestination('semarang');
         $response2 = $this->rajaOngkir->getCost('64999', '65042', 1000, 'jne');
 
         // Menggunakan app('cart') agar konsisten dengan method lainnya
         $data = [
             'items' => app('cart')->getContent(),
-            'total' => app('cart')->getTotal() ,
+            'total' => app('cart')->getTotal(),
             'response' => $response,
             'response2' => $response2
         ];
@@ -102,11 +102,11 @@ class TransaksiController extends Controller
 
     public function destinations(Request $request)
     {
-        $search = $request->query('q'); 
+        $search = $request->query('q');
         $response = $this->rajaOngkir->getDestination($search);
 
         $results = [];
-        
+
         // Perbaikan: Dukungan untuk struktur RajaOngkir standar maupun wrapper API
         $data = $response['rajaongkir']['results'] ?? $response['data'] ?? [];
 
@@ -130,13 +130,13 @@ class TransaksiController extends Controller
     {
         $origin = '64999';
         $destination = $request->query('destination');
-        $weight = 1000; 
-        $courier = 'jne'; 
+        $weight = 1000;
+        $courier = 'jne';
 
         $response = $this->rajaOngkir->getCost($origin, $destination, $weight, $courier);
 
         $results = [];
-        
+
         // Perbaikan: Mengakses key 'costs' di dalam array kurir (RajaOngkir Standard)
         // Fallback ke $response['data'] jika Anda memakai API Proxy Custom
         $data = $response['rajaongkir']['results'][0]['costs'] ?? $response['data'][0]['costs'] ?? $response['data'] ?? [];
@@ -158,7 +158,7 @@ class TransaksiController extends Controller
     }
 
     public function buy(Request $request)
-    { 
+    {
         // Menggunakan app('cart') sesuai dengan implementasi sebelumnya
         $cartItems = app('cart')->getContent();
 
@@ -168,7 +168,7 @@ class TransaksiController extends Controller
         }
 
         // Memulai transaksi Database Laravel
-        DB::beginTransaction(); 
+        DB::beginTransaction();
 
         try {
             $subtotal = 0;
@@ -189,18 +189,18 @@ class TransaksiController extends Controller
                 'alamat'      => $request->input('alamat'),
                 'ongkir'      => $ongkir,
                 'total_harga' => $subtotal + $ongkir,
-                'status'      => 0, 
+                'status'      => 0,
             ]);
 
             // 2. Insert transaction detail
             foreach ($cartItems as $item) {
                 TransactionDetail::create([
                     // Kita bisa langsung memanggil ID dari objek $transaction
-                    'transaction_id' => $transaction->id, 
+                    'transaction_id' => $transaction->id,
                     'product_id'     => $item['id'],
                     'jumlah'         => $item['quantity'],
                     'diskon'         => 0,
-                    'subtotal_harga' => $item['quantity'] * $item['price'] 
+                    'subtotal_harga' => $item['quantity'] * $item['price']
                 ]);
             }
 
@@ -209,16 +209,30 @@ class TransaksiController extends Controller
 
             // Kosongkan keranjang belanja
             app('cart')->clear();
-            
+
             // Redirect ke halaman utama (home)
             return redirect('/')->with('success', 'Pesanan berhasil dibuat!');
-
         } catch (\Exception $e) {
             // Jika ada query yang gagal atau error, batalkan semua perubahan di database
             DB::rollBack();
-            
+
             // Redirect kembali dengan pesan error (opsional: tampilkan pesan $e->getMessage() untuk debugging)
             return redirect()->back()->with('error', 'Gagal membuat transaksi. Silakan coba lagi.');
         }
+    }
+
+    public function history()
+    {
+        $username = session('username');
+
+        // Mengambil transaksi beserta relasi detail dan produknya
+        $transactions = Transaction::with('details.product')
+            ->where('username', $username)
+            ->get();
+
+        return view('v_history', [
+            'username'     => $username,
+            'transactions' => $transactions
+        ]);
     }
 }

@@ -63,7 +63,7 @@
     </a>
     <button type="submit" class="btn btn-primary">Perbarui Keranjang</button>
     @if (!empty($items))
-        <a class="btn btn-success" href="{{ url('keranjang/checkout') }}">Selesai Belanja</a>
+        <a class="btn btn-success" href="/checkout">Selesai Belanja</a>
     @endif
 </form>
 

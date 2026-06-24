@@ -20,16 +20,23 @@
     <?php
     if (session()->get('role') == 'admin') {
     ?>
-        <li class="nav-item">
-          <a class="nav-link <?php echo request()->path() == 'produk' ? '' : 'collapsed'; ?>" href="/produk">
-            <i class="bi bi-receipt"></i>
-            <span>Produk</span>
-          </a>
-        </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link <?php echo request()->path() == 'produk' ? '' : 'collapsed'; ?>" href="/produk">
+          <i class="bi bi-receipt"></i>
+          <span>Produk</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
     <?php
     }
     ?>
 
+    <li class="nav-item">
+      {{-- Menggunakan request()->is() untuk mengecek URL aktif --}}
+      <a class="nav-link {{ request()->is('history') ? '' : 'collapsed' }}" href="/history">
+        <i class="bi bi-person"></i>
+        <span>History</span>
+      </a>
+    </li>
 
   </ul>
 
